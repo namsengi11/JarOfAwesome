@@ -1,12 +1,32 @@
 import datetime
 import random
+import os.path
 
 class Jar:
   def __init__(self) -> None:
     self.eventList = []
 
+  @classmethod
+  def createJar(cls):
+    if not os.path.isfile("./storage.txt"):
+      storage = open(r"storage.txt", "w")
+      storage.close()
+    storage = open(r"storage.txt", "r+")
+    savedData = storage.readlines()
+    newJar = Jar()
+    for lineNo in range(1, len(savedData), 2):
+      date, aweEvent = savedData[lineNo-1], savedData[lineNo]
+      savedEvent = Event(aweEvent.split(": ")[0], aweEvent.split(": ")[1], date[:-1])
+      newJar.addExistingEvent(savedEvent)
+    return newJar
+
   def addEvent(self):
     event = Event.createEvent()
+    self.eventList.append(event)
+    storage = open(r"storage.txt", "a")
+    storage.write(str(event))
+
+  def addExistingEvent(self, event):
     self.eventList.append(event)
 
   def drawEvent(self):
@@ -43,7 +63,7 @@ class Event:
     eventTime = str(datetime.datetime.now())[:16]
     return cls(eventTitle, eventSummary, eventTime)
 
-myJar = Jar()
+myJar = Jar().createJar()
 
 while True:
   userInput = input("What would you like to do? Enter one of the following\n" +
