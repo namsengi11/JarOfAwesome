@@ -18,6 +18,7 @@ class Jar:
       date, aweEvent = savedData[lineNo-1], savedData[lineNo]
       savedEvent = Event(aweEvent.split(": ")[0], aweEvent.split(": ")[1], date[:-1])
       newJar.addExistingEvent(savedEvent)
+    storage.close()
     return newJar
 
   def addEvent(self):
@@ -25,6 +26,27 @@ class Jar:
     self.eventList.append(event)
     storage = open(r"storage.txt", "a")
     storage.write(str(event))
+    storage.close()
+
+  def editEvent(self, index):
+    while index >= len(self.eventList) or index < 1:
+      print("Invalid index entered!\n")
+      index = int(input("Enter the index of the awesome event!\n"))
+    print(self.eventList[index-1] + '\n')
+    confirmation = input("Is this the event you'd like to edit? Press enter to continue editing.\n")
+    if "" == confirmation:
+      editingMode = True
+      while editingMode:
+        type = input("Which part (Title/Detail/Date) would you like to edit? Press enter to exit.\n").lower()
+        typesAvail = {"title", "detail", "date"}
+        if type in typesAvail:
+          newInfo = input("Please enter new " + type + ".\n")
+          self.eventList[index-1].editInfo(type, newInfo)
+          editingMode = False
+        if type == "":
+          editingMode = False
+        elif type not in typesAvail:
+          print("Incorrect type entered. Try again.\n")
 
   def addExistingEvent(self, event):
     self.eventList.append(event)
@@ -46,13 +68,13 @@ class Jar:
     return result
 
 class Event:
-  def __init__(self, title, content, date) -> None:
+  def __init__(self, title, detail, date) -> None:
     self.title = title
-    self.content = content
+    self.detail = detail
     self.date = date
 
   def __str__(self) -> str:
-    return self.date + "\n" + self.title + ": " + self.content + '\n'
+    return self.date + "\n" + self.title + ": " + self.detail + '\n'
 
   @classmethod
   def createEvent(cls):
@@ -63,13 +85,22 @@ class Event:
     eventTime = str(datetime.datetime.now())[:16]
     return cls(eventTitle, eventSummary, eventTime)
 
+  def editInfo(self, type, newInfo):
+    if type == "title":
+      self.title = newInfo
+    elif type == "detail":
+      self.detail = newInfo
+    elif type == "date":
+      self.detail = newInfo
+
 myJar = Jar().createJar()
 
 while True:
   userInput = input("What would you like to do? Enter one of the following\n" +
     "1. Enter \"add\" to add new awesome event\n" +
-    "2. Enter \"draw\" to revisit one awesome event that happened to me\n" +
-    "3. Enter \"view\" to view all awesome events that ever happened to me\n\n")
+    "2. Enter \"edit\" to edit an awesome event in the jar\n" +
+    "3. Enter \"draw\" to revisit one awesome event that happened to me\n" +
+    "4. Enter \"view\" to view all awesome events that ever happened to me\n\n")
   print("\n")
 
   if userInput == "add":
@@ -80,6 +111,10 @@ while True:
     print(myJar.drawEvent())
   elif userInput == "view":
     print(str(myJar))
+  elif userInput == "edit":
+    print(str(myJar))
+    index = int(input("Enter the index of the awesome event!\n"))
+    myJar.editEvent(index)
   else:
     print("Unknown input! Try again!\n")
 
