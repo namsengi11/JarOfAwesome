@@ -28,11 +28,15 @@ class Jar:
     storage.write(str(event))
     storage.close()
 
-  def editEvent(self, index):
+  def takeEventIndex(self, index):
     while index >= len(self.eventList) or index < 1:
       print("Invalid index entered!\n")
       index = int(input("Enter the index of the awesome event!\n"))
-    print(self.eventList[index-1] + '\n')
+    return index
+
+  def editEvent(self, index):
+    index = self.takeEventIndex(index)
+    print(str(self.eventList[index-1]) + '\n')
     confirmation = input("Is this the event you'd like to edit? Press enter to continue editing.\n")
     if "" == confirmation:
       editingMode = True
@@ -42,11 +46,19 @@ class Jar:
         if type in typesAvail:
           newInfo = input("Please enter new " + type + ".\n")
           self.eventList[index-1].editInfo(type, newInfo)
+          print("\nAwesome event successfully edited!\n\n")
           editingMode = False
         if type == "":
           editingMode = False
         elif type not in typesAvail:
           print("Incorrect type entered. Try again.\n")
+
+  def deleteEvent(self, index):
+    index = self.takeEventIndex(index)
+    print('\n' + str(self.eventList[index-1]))
+    confirmation = input("Is this the event you'd like to delete? Press enter to confirm.\n")
+    if confirmation == "":
+      self.eventList.pop(index-1)
 
   def addExistingEvent(self, event):
     self.eventList.append(event)
@@ -97,10 +109,11 @@ myJar = Jar().createJar()
 
 while True:
   userInput = input("What would you like to do? Enter one of the following\n" +
-    "1. Enter \"add\" to add new awesome event\n" +
+    "1. Enter \"add\" to add new awesome event :D\n" +
     "2. Enter \"edit\" to edit an awesome event in the jar\n" +
-    "3. Enter \"draw\" to revisit one awesome event that happened to me\n" +
-    "4. Enter \"view\" to view all awesome events that ever happened to me\n\n")
+    "3. Enter \"delete\" to delete an awesome event in the jar ;(\n"
+    "4. Enter \"draw\" to revisit one awesome event that happened to me :DD\n" +
+    "5. Enter \"view\" to view all awesome events that ever happened to me\n\n")
   print("\n")
 
   if userInput == "add":
@@ -115,6 +128,10 @@ while True:
     print(str(myJar))
     index = int(input("Enter the index of the awesome event!\n"))
     myJar.editEvent(index)
+  elif userInput == "delete":
+    print(str(myJar))
+    index = int(input("Enter the index of the awesome event!\n"))
+    myJar.deleteEvent(index)
   else:
     print("Unknown input! Try again!\n")
 
